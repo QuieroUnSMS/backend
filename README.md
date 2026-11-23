@@ -1,6 +1,6 @@
 # QuieroUnSMS Backend
 
-Reference Contact CRUD API (FastAPI, PostgreSQL).
+Official **QuieroUnSMS** API
 
 ## Requirements
 
