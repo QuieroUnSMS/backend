@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: run-sql-via-docker-exec
+expected_outcome: |
+  Agent uses docker exec (or docker compose exec) against quierounsms-postgres to
+  run a non-interactive psql query on quierounsms_dev without requiring host psql.

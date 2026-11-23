@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: start-db-and-check-health
+expected_outcome: |
+  Agent starts the db service with docker compose from repo root, confirms healthy
+  status via docker compose ps or pg_isready inside the container, and reports
+  that PostgreSQL is reachable on localhost:5432 for quierounsms_dev.
