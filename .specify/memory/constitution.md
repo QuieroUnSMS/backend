@@ -1,13 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0
-- Modified principles: None renamed (I–II unchanged)
-- Added principles: III. MVP-First Product Scope; IV. Privacy and Minimal PII; V. Legal Compliance and Acceptable Use
-- Added sections: Product Context (preamble under title)
-- Modified sections: Technical Constraints (providers, payments, market, languages); Development Workflow (MVP gates, compliance)
-- Removed sections: None
+- Version change: 1.2.0 → 1.2.1
+- Modified principles: None
+- Added principles: None
+- Modified sections: Technical Constraints (canonical path → repository-root openapi.yaml)
+- Removed sections: Feature-scoped contract fork guidance
 - Follow-up TODOs: None
-- Source: docs/welcome.md (last update 2026-11-23)
+- Amendment rationale: User request — single canonical OpenAPI at repository root
 -->
 
 # QuieroUnSMS Backend Constitution
@@ -72,6 +71,20 @@ reflected in enforceable backend rules (e.g., eligibility, access restriction) w
 technically appropriate. Rationale: Temporary-number services carry legal and platform risk;
 backend behavior is part of compliance, not only policy text.
 
+### VI. OpenAPI Contract Parity
+
+The backend MUST maintain a version-controlled OpenAPI specification (3.x) that describes the
+current public HTTP API: paths, operations, request and response schemas, and documented status
+codes. Whenever an API surface is created, modified, or removed (routes, handlers, Pydantic
+request/response models, or externally visible error semantics), the OpenAPI specification MUST
+be updated in the same change set so it accurately reflects the deployed contract. Reviewers MUST
+treat OpenAPI drift as a blocking defect: implementation MUST NOT merge ahead of the spec, and
+the spec MUST NOT describe endpoints or behaviors that are not implemented unless explicitly
+marked deprecated with a removal plan in the feature spec. FastAPI interactive docs at `/docs`
+MUST remain consistent with the committed OpenAPI artifact for paths and documented responses
+covered by the contract. Rationale: A single, accurate contract enables client integration,
+Spec Kit parity checks, and safe API evolution without silent breaking changes.
+
 ## Technical Constraints
 
 The following stack, integrations, and versions are mandatory for this project unless amended
@@ -81,6 +94,7 @@ by this constitution:
 |------------|-------------|
 | Language | Python 3.15.2 |
 | HTTP API | FastAPI |
+| API contract | OpenAPI 3.x at repository root `openapi.yaml`, updated with every API change |
 | Testing | Pytest |
 | Validation & settings | Pydantic |
 | Database | PostgreSQL 18.7 |
@@ -89,6 +103,10 @@ by this constitution:
 | Payments | SPEI and Stripe |
 | Primary market | Mexico |
 | Languages | Spanish for applicable user-facing API messages; English for repository specs and docs |
+
+The canonical OpenAPI document is `openapi.yaml` at the repository root. New features that
+extend the HTTP surface MUST update this file in the same change set as route and schema changes;
+per-feature copies under `specs/` MUST NOT replace the root contract.
 
 Real-time SMS delivery to clients is a core non-functional requirement: designs MUST avoid
 unnecessary polling-only paths where push or streaming is specified in the feature plan.
@@ -107,6 +125,9 @@ feature plan and MUST NOT contradict this section without a constitution amendme
 - Every behavioral change MUST include Pytest coverage at the appropriate layer (unit tests
   for services with mocked repositories; integration tests when persistence, provider APIs,
   payment webhooks, or API contracts change).
+- HTTP contract changes MUST include coordinated updates to the OpenAPI specification and,
+  where applicable, contract parity verification (e.g., paths and status codes in `/docs` vs.
+  the committed `openapi.yaml`).
 - Provider and payment integrations MUST be abstracted behind services; route handlers MUST NOT
   call external provider or payment APIs directly.
 - Pydantic models MUST be used for request/response schemas and application settings;
@@ -127,10 +148,10 @@ this document prevails until amended.
   principles or material expansions, PATCH for clarifications only.
 - **Compliance**: Authors and reviewers MUST verify features against Core Principles,
   Technical Constraints, and Development Workflow. Complexity that violates layering,
-  skips TDD, or expands scope beyond MVP without a spec MUST be rejected or justified in
-  writing and approved via amendment.
+  skips TDD, expands scope beyond MVP without a spec, or merges API changes without OpenAPI
+  updates MUST be rejected or justified in writing and approved via amendment.
 - **Runtime guidance**: Product summary lives in `docs/welcome.md`. Feature-level detail lives
   in `.specify/templates/plan-template.md`, `spec-template.md`, and `tasks-template.md`;
   those artifacts MUST NOT weaken this constitution.
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2026-11-23
+**Version**: 1.2.1 | **Ratified**: 2025-11-16 | **Last Amended**: 2026-11-23

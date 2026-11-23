@@ -1,0 +1,196 @@
+openapi: 3.1.0
+info:
+  title: QuieroUnSMS Backend API
+  version: 0.1.0
+  description: Canonical HTTP contract for the QuieroUnSMS backend. Updated with every API change.
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+
+paths:
+  /contacts:
+    get:
+      operationId: listContacts
+      summary: List all contacts
+      responses:
+        "200":
+          description: Contact collection (may be empty)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactRead"
+    post:
+      operationId: createContact
+      summary: Create a contact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRead"
+        "409":
+          description: Phone number already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /contacts/{contact_id}:
+    parameters:
+      - name: contact_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getContact
+      summary: Get contact by id
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRead"
+        "404":
+          description: Contact not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+    patch:
+      operationId: updateContact
+      summary: Update contact fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactRead"
+        "404":
+          description: Contact not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "409":
+          description: Phone number already in use by another contact
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+    delete:
+      operationId: deleteContact
+      summary: Delete contact
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Contact not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+components:
+  schemas:
+    ContactCreate:
+      type: object
+      required: [name, phone_e164]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          example: Ada Lovelace
+        phone_e164:
+          type: string
+          pattern: "^\\+[1-9]\\d{1,14}$"
+          example: "+15551234567"
+
+    ContactUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        phone_e164:
+          type: string
+          pattern: "^\\+[1-9]\\d{1,14}$"
+      minProperties: 1
+
+    ContactRead:
+      type: object
+      required: [id, name, phone_e164, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone_e164:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ErrorDetail:
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: object
+
+    ValidationError:
+      type: object
+      description: FastAPI-style validation payload
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc:
+                type: array
+                items: {}
+              msg:
+                type: string
+              type:
+                type: string
