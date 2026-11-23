@@ -6,7 +6,7 @@ description: "Task list for Starting Point CRUD Example"
 
 **Input**: Design documents from `/specs/001-starting-point/`
 
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/openapi.yaml, quickstart.md
+**Prerequisites**: plan.md, spec.md, research.md, data-model.md, openapi.yaml (repo root), quickstart.md
 
 **Tests**: Included — constitution TDD (non-negotiable) and plan testing strategy. Write tests first; confirm failure before implementation.
 
@@ -115,7 +115,7 @@ description: "Task list for Starting Point CRUD Example"
 
 - [x] T026 Register exception handlers mapping `ContactNotFoundError` → 404 and `DuplicatePhoneError` → 409 in `src/app/main.py`
 - [x] T027 Run end-to-end steps in `specs/001-starting-point/quickstart.md` (pytest + manual table)
-- [x] T028 [P] Verify `/docs` OpenAPI matches paths and status codes in `specs/001-starting-point/contracts/openapi.yaml`
+- [x] T028 [P] Verify `/docs` OpenAPI matches paths and status codes in repository-root `openapi.yaml`
 
 ---
 

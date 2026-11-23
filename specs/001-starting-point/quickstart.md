@@ -3,7 +3,7 @@
 **Feature**: `001-starting-point` | **Date**: 2025-11-16
 
 This guide validates end-to-end behavior against [spec.md](./spec.md) and
-[contracts/openapi.yaml](./contracts/openapi.yaml). Implementation details live in tasks and
+[openapi.yaml](../../openapi.yaml) at the repository root. Implementation details live in tasks and
 source; commands below assume the standard layout from [plan.md](./plan.md).
 
 ## Prerequisites
@@ -86,4 +86,4 @@ Negative checks:
 ## References
 
 - Data rules: [data-model.md](./data-model.md)
-- HTTP contract: [contracts/openapi.yaml](./contracts/openapi.yaml)
+- HTTP contract: [openapi.yaml](../../openapi.yaml)

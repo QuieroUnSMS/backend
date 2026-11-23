@@ -32,6 +32,8 @@ uv run uvicorn app.main:app --reload --app-dir src
 
 API docs: http://localhost:8000/docs
 
+Canonical HTTP contract: [openapi.yaml](openapi.yaml) (must stay in sync with `/docs`).
+
 ## Tests
 
 ```bash

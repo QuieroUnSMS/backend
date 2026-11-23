@@ -53,7 +53,7 @@ foundation for future SMS features
 
 **Pre-Phase 0 gate**: PASS (no violations)
 
-**Post-Phase 1 gate**: PASS — [data-model.md](./data-model.md) and [contracts/openapi.yaml](./contracts/openapi.yaml) preserve layering and spec behaviors (404, 409, 422); no extra complexity requiring justification.
+**Post-Phase 1 gate**: PASS — [data-model.md](./data-model.md) and [openapi.yaml](../../openapi.yaml) preserve layering and spec behaviors (404, 409, 422); no extra complexity requiring justification.
 
 ## Project Structure
 
@@ -65,14 +65,14 @@ specs/001-starting-point/
 ├── research.md          # Phase 0
 ├── data-model.md        # Phase 1
 ├── quickstart.md        # Phase 1
-├── contracts/
-│   └── openapi.yaml     # Phase 1
 ├── checklists/
 │   └── requirements.md
 └── tasks.md             # Phase 2 (/speckit-tasks — not yet created)
 ```
 
 ### Source Code (repository root)
+
+HTTP contract: `openapi.yaml` at repository root (updated with API changes).
 
 ```text
 src/
