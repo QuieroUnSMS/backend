@@ -53,12 +53,12 @@
 
 ## Gaps & Open Questions
 
-- [NEEDS CLARIFICATION: Retention TTL for guest sessions, purchase history, and abandoned checkouts]
-- [NEEDS CLARIFICATION: Whether the client still holds a session token in cookies/localStorage while the backend is source of truth]
-- [NEEDS CLARIFICATION: Duplicate registration policy when email or phone already belongs to another account]
-- [NEEDS CLARIFICATION: What minimal PII Stripe/SPEI flows require at MVP for Mexico]
-- [NEEDS CLARIFICATION: Whether “no verification” is a permanent policy or a launch shortcut with a planned OTP phase]
-- [NEEDS CLARIFICATION: Real-user validation (waitlist, interviews) beyond internal product requirements]
+- **Resolved (product)**: Guest sessions will live as long as the user provides an email or phone number to complete the account; up until that moment, the user will be authenticated using the session key generated from the frontend. [NEEDS CLARIFICATION: Retention TTL for guest sessions, purchase history, and abandoned checkouts]
+- **Resolved (product)**: Client will hold a session token in cookies/localStorage/sessionStorage, and the backend will authenticate that token and retrieve the account's information (history, purchases, so on...) [NEEDS CLARIFICATION: Whether the client still holds a session token in cookies/localStorage while the backend is source of truth]
+- **Resolved (product)**: No account will be created if the email or phone number already belong to another account. [NEEDS CLARIFICATION: Duplicate registration policy when email or phone already belongs to another account]
+- **Resolved (product)**: For now, there will be no payment gateway. [CLARIFICATION: What minimal PII Stripe/SPEI flows require at MVP for Mexico]
+- **Resolved (product)**: Permanent policy. There will be users that won't provide email or phone number to create a regular account. [NEEDS CLARIFICATION: Whether “no verification” is a permanent policy or a launch shortcut with a planned OTP phase]
+- **Resolved (product)**: No Real-user validation. [NEEDS CLARIFICATION: Real-user validation (waitlist, interviews) beyond internal product requirements]
 
 ## Sources
 

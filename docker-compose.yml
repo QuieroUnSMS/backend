@@ -1,4 +1,15 @@
 services:
+  api:
+    build: .
+    container_name: quierounsms-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/quierounsms_dev
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:18.7
     container_name: quierounsms-postgres

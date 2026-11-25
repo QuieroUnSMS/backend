@@ -1,0 +1,832 @@
+{
+  "info": {
+    "_postman_id": "quierounsms-backend-api",
+    "name": "QuieroUnSMS Backend API",
+    "description": "Canonical Postman collection for the QuieroUnSMS backend. Import at repository root.\n\n**Auth**: After `POST /session`, the collection stores `session_token` automatically. Protected `/me/*` routes use Bearer auth via collection variables.\n\n**Feature**: `002-user-registration` — guest-first identity, optional registration, checkout and purchase placeholders.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{session_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "session_token",
+      "value": ""
+    },
+    {
+      "key": "contact_id",
+      "value": "00000000-0000-4000-8000-000000000001"
+    }
+  ],
+  "item": [
+    {
+      "name": "002-user-registration",
+      "description": "Guest-first identity and optional registration ([specs/002-user-registration/spec.md](specs/002-user-registration/spec.md)).",
+      "item": [
+        {
+          "name": "Session",
+          "item": [
+            {
+              "name": "Bootstrap session (new guest)",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/session",
+                "description": "US1 — Issue a new guest identity when no valid bearer is sent. Expect `201` and `identity.registration_status` = `guest`."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201 || pm.response.code === 200) {",
+                      "  const body = pm.response.json();",
+                      "  if (body.session_token) {",
+                      "    pm.collectionVariables.set('session_token', body.session_token);",
+                      "  }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "response": [
+                {
+                  "name": "201 New guest",
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"session_token\": \"opaque-token-example\",\n  \"identity\": {\n    \"id\": \"00000000-0000-4000-8000-000000000010\",\n    \"registration_status\": \"guest\",\n    \"email\": null,\n    \"phone_e164\": null,\n    \"is_suspended\": false,\n    \"created_at\": \"2026-11-24T12:00:00Z\",\n    \"updated_at\": \"2026-11-24T12:00:00Z\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Bootstrap session (resume existing)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/session",
+                "description": "US1 — Present stored `session_token` via collection Bearer auth. Expect `200` when the credential is valid."
+              },
+              "response": [
+                {
+                  "name": "200 Session recognized",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"session_token\": \"opaque-token-example\",\n  \"identity\": {\n    \"id\": \"00000000-0000-4000-8000-000000000010\",\n    \"registration_status\": \"guest\",\n    \"email\": null,\n    \"phone_e164\": null,\n    \"is_suspended\": false,\n    \"created_at\": \"2026-11-24T12:00:00Z\",\n    \"updated_at\": \"2026-11-24T12:00:00Z\"\n  }\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Get current identity",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/me",
+                "description": "US2/US3 — Current identity profile. Requires Bearer session."
+              },
+              "response": [
+                {
+                  "name": "200 Profile",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000010\",\n  \"registration_status\": \"registered\",\n  \"email\": \"buyer@example.com\",\n  \"phone_e164\": \"+525512345678\",\n  \"is_suspended\": false,\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:05:00Z\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Registration",
+          "item": [
+            {
+              "name": "Upgrade with email",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"buyer@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/registration",
+                "description": "US2 — Guest upgrades with a unique email. Expect `200` and `registration_status` = `registered`."
+              },
+              "response": [
+                {
+                  "name": "200 Registered",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000010\",\n  \"registration_status\": \"registered\",\n  \"email\": \"buyer@example.com\",\n  \"phone_e164\": null,\n  \"is_suspended\": false,\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:05:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Upgrade with phone (E.164)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_e164\": \"+525551234567\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/registration",
+                "description": "US2 — Guest upgrades with E.164 phone (leading `+`). Expect `200` when phone is unique."
+              },
+              "response": [
+                {
+                  "name": "200 Registered",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000010\",\n  \"registration_status\": \"registered\",\n  \"email\": null,\n  \"phone_e164\": \"+525551234567\",\n  \"is_suspended\": false,\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:05:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Upgrade conflict (example email taken)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"already-taken@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/registration",
+                "description": "US2 — Second guest attempts taken email. Expect `409`; guest remains guest."
+              },
+              "response": [
+                {
+                  "name": "409 Conflict",
+                  "status": "Conflict",
+                  "code": 409,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"detail\": \"Email already in use\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Complementary contact",
+          "item": [
+            {
+              "name": "Add phone (registered with email)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_e164\": \"+525512345678\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/contact",
+                "description": "US3 — Add missing phone after email registration."
+              },
+              "response": [
+                {
+                  "name": "200 Updated",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000010\",\n  \"registration_status\": \"registered\",\n  \"email\": \"buyer@example.com\",\n  \"phone_e164\": \"+525512345678\",\n  \"is_suspended\": false,\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:10:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Add email (registered with phone)",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"buyer2@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/contact",
+                "description": "US3 — Add missing email after phone registration."
+              },
+              "response": [
+                {
+                  "name": "200 Updated",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000010\",\n  \"registration_status\": \"registered\",\n  \"email\": \"buyer2@example.com\",\n  \"phone_e164\": \"+525551234567\",\n  \"is_suspended\": false,\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:10:00Z\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Guest activity",
+          "item": [
+            {
+              "name": "Put checkout state",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"state\": {\n    \"step\": \"payment\",\n    \"country\": \"MX\",\n    \"service\": \"telegram\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/checkout-state",
+                "description": "US1 — Persist in-progress checkout placeholder for the current identity."
+              },
+              "response": [
+                {
+                  "name": "200 Saved",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"state\": {\n    \"step\": \"payment\",\n    \"country\": \"MX\",\n    \"service\": \"telegram\"\n  },\n  \"updated_at\": \"2026-11-24T12:02:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get checkout state",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/me/checkout-state",
+                "description": "US1 — Resume checkout on return visit with same session."
+              },
+              "response": [
+                {
+                  "name": "200 Checkout state",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"state\": {\n    \"step\": \"payment\",\n    \"country\": \"MX\",\n    \"service\": \"telegram\"\n  },\n  \"updated_at\": \"2026-11-24T12:02:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "Append purchase history",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"summary\": \"Test purchase — Telegram MX\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/purchase-history",
+                "description": "US1 — Append purchase history placeholder (until full purchase feature)."
+              },
+              "response": [
+                {
+                  "name": "201 Created",
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000020\",\n  \"summary\": \"Test purchase — Telegram MX\",\n  \"created_at\": \"2026-11-24T12:03:00Z\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "List purchase history",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/me/purchase-history",
+                "description": "US1 — List placeholders tied to the current identity."
+              },
+              "response": [
+                {
+                  "name": "200 History",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "[\n  {\n    \"id\": \"00000000-0000-4000-8000-000000000020\",\n    \"summary\": \"Test purchase — Telegram MX\",\n    \"created_at\": \"2026-11-24T12:03:00Z\"\n  }\n]"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Quickstart flow (ordered)",
+          "description": "Run top-to-bottom after starting the API ([quickstart.md](specs/002-user-registration/quickstart.md)).",
+          "item": [
+            {
+              "name": "1 — Bootstrap guest session",
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/session"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('guest session issued', function () {",
+                      "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "  const body = pm.response.json();",
+                      "  pm.expect(body.identity.registration_status).to.eql('guest');",
+                      "  pm.collectionVariables.set('session_token', body.session_token);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "2 — Save checkout state",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"state\": {\n    \"step\": \"payment\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/checkout-state"
+              },
+              "response": []
+            },
+            {
+              "name": "3 — Append purchase history",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"summary\": \"Test purchase\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/purchase-history"
+              },
+              "response": []
+            },
+            {
+              "name": "4 — Register with email",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"buyer@example.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/registration"
+              },
+              "response": []
+            },
+            {
+              "name": "5 — Add complementary phone",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_e164\": \"+525512345678\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/me/contact"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "description": "Contacts CRUD from root [openapi.yaml](openapi.yaml) (no session auth).",
+      "auth": {
+        "type": "noauth"
+      },
+      "item": [
+        {
+          "name": "List contacts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/contacts"
+          },
+          "response": [
+            {
+              "name": "200 Empty or list",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[]"
+            }
+          ]
+        },
+        {
+          "name": "Create contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Lovelace\",\n  \"phone_e164\": \"+15551234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/contacts"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('contact_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"00000000-0000-4000-8000-000000000001\",\n  \"name\": \"Ada Lovelace\",\n  \"phone_e164\": \"+15551234567\",\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get contact by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/contacts/{{contact_id}}"
+          },
+          "response": [
+            {
+              "name": "200 Found",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{contact_id}}\",\n  \"name\": \"Ada Lovelace\",\n  \"phone_e164\": \"+15551234567\",\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update contact",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada L.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/contacts/{{contact_id}}"
+          },
+          "response": [
+            {
+              "name": "200 Updated",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"{{contact_id}}\",\n  \"name\": \"Ada L.\",\n  \"phone_e164\": \"+15551234567\",\n  \"created_at\": \"2026-11-24T12:00:00Z\",\n  \"updated_at\": \"2026-11-24T12:01:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete contact",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/contacts/{{contact_id}}"
+          },
+          "response": [
+            {
+              "name": "204 Deleted",
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "plain",
+              "header": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

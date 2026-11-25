@@ -1,12 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.2.0 → 1.2.1
-- Modified principles: None
-- Added principles: None
-- Modified sections: Technical Constraints (canonical path → repository-root openapi.yaml)
-- Removed sections: Feature-scoped contract fork guidance
-- Follow-up TODOs: None
-- Amendment rationale: User request — single canonical OpenAPI at repository root
+- Version change: 1.2.1 → 1.3.0
+- Modified principles: None (renumbered N/A)
+- Added principles: VII. Postman Collection Parity
+- Modified sections: Technical Constraints (Postman artifact), Development Workflow,
+  Governance (compliance review)
+- Removed sections: None
+- Follow-up TODOs: Create or update root-level `postman_collection.json` when API endpoints
+  exist or change (deferred to implementation)
+- Amendment rationale: Require root-level Postman collection with per-endpoint examples,
+  maintained in parity with the HTTP API like OpenAPI
 -->
 
 # QuieroUnSMS Backend Constitution
@@ -85,6 +88,21 @@ MUST remain consistent with the committed OpenAPI artifact for paths and documen
 covered by the contract. Rationale: A single, accurate contract enables client integration,
 Spec Kit parity checks, and safe API evolution without silent breaking changes.
 
+### VII. Postman Collection Parity
+
+The backend MUST maintain a version-controlled Postman Collection (v2.1 JSON format) at the
+repository root as `postman_collection.json`, importable directly into the Postman application
+without manual restructuring. The collection MUST describe the current public HTTP API: folders or
+items aligned with operations, methods, paths, headers, and bodies consistent with the committed
+OpenAPI contract. Whenever an API surface is created, modified, or removed, the Postman
+collection MUST be created or updated in the same change set. Every operation in the collection
+MUST include at least one request example with representative parameters and bodies (and
+response examples where Postman supports them for that item) so manual testing and onboarding do
+not depend on guesswork. Reviewers MUST treat Postman drift (missing operations, stale URLs,
+or operations without examples) as a blocking defect alongside OpenAPI drift. Rationale:
+Root-level Postman parity with OpenAPI gives integrators and QA a one-click import path and
+keeps exploratory testing aligned with the shipped contract.
+
 ## Technical Constraints
 
 The following stack, integrations, and versions are mandatory for this project unless amended
@@ -95,6 +113,7 @@ by this constitution:
 | Language | Python 3.15.2 |
 | HTTP API | FastAPI |
 | API contract | OpenAPI 3.x at repository root `openapi.yaml`, updated with every API change |
+| API manual testing | Postman Collection v2.1 at repository root `postman_collection.json`, with per-operation request examples, updated with every API change |
 | Testing | Pytest |
 | Validation & settings | Pydantic |
 | Database | PostgreSQL 18.7 |
@@ -107,6 +126,11 @@ by this constitution:
 The canonical OpenAPI document is `openapi.yaml` at the repository root. New features that
 extend the HTTP surface MUST update this file in the same change set as route and schema changes;
 per-feature copies under `specs/` MUST NOT replace the root contract.
+
+The canonical Postman import artifact is `postman_collection.json` at the repository root. New
+features that extend the HTTP surface MUST update this file in the same change set as route and
+schema changes, including examples for each affected operation; per-feature Postman exports
+under `specs/` MUST NOT replace the root collection.
 
 Real-time SMS delivery to clients is a core non-functional requirement: designs MUST avoid
 unnecessary polling-only paths where push or streaming is specified in the feature plan.
@@ -128,6 +152,9 @@ feature plan and MUST NOT contradict this section without a constitution amendme
 - HTTP contract changes MUST include coordinated updates to the OpenAPI specification and,
   where applicable, contract parity verification (e.g., paths and status codes in `/docs` vs.
   the committed `openapi.yaml`).
+- HTTP contract changes MUST include coordinated creation or updates to `postman_collection.json`
+  so every added or changed operation has importable request examples; reviewers MUST verify
+  import into Postman succeeds and examples match documented schemas.
 - Provider and payment integrations MUST be abstracted behind services; route handlers MUST NOT
   call external provider or payment APIs directly.
 - Pydantic models MUST be used for request/response schemas and application settings;
@@ -149,9 +176,9 @@ this document prevails until amended.
 - **Compliance**: Authors and reviewers MUST verify features against Core Principles,
   Technical Constraints, and Development Workflow. Complexity that violates layering,
   skips TDD, expands scope beyond MVP without a spec, or merges API changes without OpenAPI
-  updates MUST be rejected or justified in writing and approved via amendment.
+  or Postman collection updates MUST be rejected or justified in writing and approved via amendment.
 - **Runtime guidance**: Product summary lives in `docs/welcome.md`. Feature-level detail lives
   in `.specify/templates/plan-template.md`, `spec-template.md`, and `tasks-template.md`;
   those artifacts MUST NOT weaken this constitution.
 
-**Version**: 1.2.1 | **Ratified**: 2025-11-16 | **Last Amended**: 2026-11-23
+**Version**: 1.3.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2026-11-24

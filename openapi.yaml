@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: QuieroUnSMS Backend API
-  version: 0.1.0
+  version: 0.2.0
   description: Canonical HTTP contract for the QuieroUnSMS backend. Updated with every API change.
 
 servers:
@@ -122,7 +122,270 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorDetail"
 
+  /session:
+    post:
+      operationId: bootstrapSession
+      summary: Create a guest session or resume the current one
+      responses:
+        "201":
+          description: New guest identity and session credential issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionBootstrapResponse"
+        "200":
+          description: Existing session recognized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionBootstrapResponse"
+        "401":
+          description: Invalid bearer when provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+  /me:
+    get:
+      operationId: getCurrentIdentity
+      summary: Current identity profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityRead"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+  /me/registration:
+    post:
+      operationId: registerCurrentIdentity
+      summary: Upgrade guest to registered with email or phone
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
+      responses:
+        "200":
+          description: Registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityRead"
+        "409":
+          description: Email or phone already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "422":
+          description: Validation error or already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+  /me/contact:
+    patch:
+      operationId: addComplementaryContact
+      summary: Add the missing email or phone on a registered identity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactPatchRequest"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityRead"
+        "409":
+          description: Identifier conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+  /me/checkout-state:
+    get:
+      operationId: getCheckoutState
+      summary: Get in-progress checkout placeholder
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Checkout state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutStateRead"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+    put:
+      operationId: putCheckoutState
+      summary: Replace checkout placeholder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutStateWrite"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutStateRead"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
+  /me/purchase-history:
+    get:
+      operationId: listPurchaseHistory
+      summary: List purchase history placeholders
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: History entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PurchaseHistoryEntry"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+    post:
+      operationId: appendPurchaseHistory
+      summary: Append a purchase history placeholder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseHistoryCreate"
+      responses:
+        "201":
+          description: Created entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseHistoryEntry"
+        "401":
+          description: Missing or invalid session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+        "403":
+          description: Identity suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetail"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
   schemas:
     ContactCreate:
       type: object
@@ -194,3 +457,97 @@ components:
                 type: string
               type:
                 type: string
+
+    SessionBootstrapResponse:
+      type: object
+      required: [session_token, identity]
+      properties:
+        session_token:
+          type: string
+        identity:
+          $ref: "#/components/schemas/IdentityRead"
+
+    IdentityRead:
+      type: object
+      required: [id, registration_status, is_suspended, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        registration_status:
+          type: string
+          enum: [guest, registered]
+        email:
+          type: string
+          nullable: true
+        phone_e164:
+          type: string
+          nullable: true
+          pattern: "^\\+[1-9]\\d{1,14}$"
+        is_suspended:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        phone_e164:
+          type: string
+          pattern: "^\\+[1-9]\\d{1,14}$"
+
+    ContactPatchRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        phone_e164:
+          type: string
+          pattern: "^\\+[1-9]\\d{1,14}$"
+
+    CheckoutStateRead:
+      type: object
+      required: [state, updated_at]
+      properties:
+        state:
+          type: object
+          additionalProperties: true
+        updated_at:
+          type: string
+          format: date-time
+
+    CheckoutStateWrite:
+      type: object
+      required: [state]
+      properties:
+        state:
+          type: object
+          additionalProperties: true
+
+    PurchaseHistoryEntry:
+      type: object
+      required: [id, summary, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        summary:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+
+    PurchaseHistoryCreate:
+      type: object
+      required: [summary]
+      properties:
+        summary:
+          type: string
+          maxLength: 255
