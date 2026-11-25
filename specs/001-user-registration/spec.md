@@ -108,7 +108,7 @@ suspend an identity and confirm subsequent requests are refused with a clear out
 - Identity remains guest indefinitely if the user never upgrades; guest records are not deleted by
   routine retention sweeps.
 - International phone numbers must be E.164 with leading `+`; other formats are rejected without
-  auto-normalization (consistent with project contact rules).
+  auto-normalization.
 
 ## Requirements *(mandatory)*
 
@@ -184,8 +184,7 @@ suspend an identity and confirm subsequent requests are refused with a clear out
 - No verification at signup is an accepted product risk for this release.
 - Guest session credentials are stored by the client (cookies, session storage, or local storage);
   the server is the source of truth for identity and owned activity.
-- Phone numbers on accounts follow the same E.164-with-`+` validation policy as the contacts
-  reference feature.
+- Phone numbers on accounts use E.164 with a leading `+`.
 - Acceptable-use suspension rules align with constitution and `docs/welcome.md`; detailed legal copy
   lives in policy documents, not this spec.
 - Indefinite guest retention is intentional; operational and privacy impacts are acknowledged and may

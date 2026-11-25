@@ -42,4 +42,17 @@ export TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/q
 uv run pytest tests/integration -q
 ```
 
-Full validation: [specs/001-starting-point/quickstart.md](specs/001-starting-point/quickstart.md)
+Full validation: [specs/001-user-registration/quickstart.md](specs/001-user-registration/quickstart.md)
+
+## Continuous integration
+
+GitHub Actions runs the same commands on every **pull request** and every **push** to `main`
+(see [.github/workflows/tests.yml](.github/workflows/tests.yml)):
+
+1. `uv sync --frozen`
+2. Unit tests: `uv run pytest tests/unit -q`
+3. Integration tests against ephemeral PostgreSQL 18.7:
+   `TEST_DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/quierounsms_test`
+   `uv run pytest tests/integration -q`
+
+Feature acceptance: [specs/002-github-actions/quickstart.md](specs/002-github-actions/quickstart.md)

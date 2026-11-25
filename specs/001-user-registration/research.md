@@ -70,7 +70,7 @@
 
 - **Decision**: Unit tests on `IdentityService` / `SessionService` with mocked repositories; integration
   tests for full US1–US3 flows against PostgreSQL test DB per constitution.
-- **Rationale**: Same pattern as `001-starting-point`.
+- **Rationale**: Service behavior is unit-tested with mocks; persistence and HTTP status codes are covered by integration tests.
 - **Alternatives considered**: Auth-only mocks without DB — insufficient for unique constraints.
 
 ## 9. OpenAPI and contract location

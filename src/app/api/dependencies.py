@@ -5,12 +5,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.db.session import get_session
-from app.repositories.contact_repository import SqlAlchemyContactRepository
 from app.repositories.identity_repository import SqlAlchemyIdentityRepository
 from app.repositories.session_credential_repository import (
     SqlAlchemySessionCredentialRepository,
 )
-from app.services.contact_service import ContactService
 from app.services.identity_service import IdentityService
 from app.services.session_service import SessionService
 
@@ -19,11 +17,6 @@ _bearer = HTTPBearer(auto_error=False)
 
 def get_db() -> Generator[Session, None, None]:
     yield from get_session()
-
-
-def get_contact_service(db: Session = Depends(get_db)) -> ContactService:
-    repository = SqlAlchemyContactRepository(db)
-    return ContactService(repository)
 
 
 def get_session_service(db: Session = Depends(get_db)) -> SessionService:

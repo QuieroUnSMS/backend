@@ -1,0 +1,58 @@
+# CI pipeline contract (002-github-actions)
+# Not an HTTP API; defines the repository's automated test integration surface for contributors.
+apiVersion: quierounsms/v1
+kind: ContinuousIntegrationPipeline
+metadata:
+  name: tests
+  feature: 002-github-actions
+spec:
+  platform: github-actions
+  workflowFile: .github/workflows/tests.yml
+  triggers:
+    pullRequest:
+      branches: [main]
+    push:
+      branches: [main]
+  jobs:
+    - name: tests
+      runsOn: ubuntu-latest
+      timeoutMinutes: 15
+      services:
+        postgres:
+          image: postgres:18.7
+          env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+          healthcheck:
+            test: pg_isready -U postgres
+            intervalSeconds: 3
+            timeoutSeconds: 5
+            retries: 10
+      environment:
+        TEST_DATABASE_URL: >-
+          postgresql+psycopg://postgres:postgres@localhost:5432/quierounsms_test
+      steps:
+        - id: checkout
+          uses: actions/checkout@v4
+        - id: setup_uv
+          uses: astral-sh/setup-uv@v5
+          with:
+            python-version-file: .python-version
+        - id: sync_dependencies
+          run: uv sync --frozen
+        - id: unit_tests
+          run: uv run pytest tests/unit -q
+        - id: prepare_test_database
+          run: >-
+            PGPASSWORD=postgres psql -h localhost -U postgres -d postgres
+            -v ON_ERROR_STOP=1 -c 'CREATE DATABASE quierounsms_test;'
+        - id: integration_tests
+          env:
+            TEST_DATABASE_URL: ${TEST_DATABASE_URL}
+          run: uv run pytest tests/integration -q
+  outcomes:
+    success: All steps exit 0; check green on PR/commit
+    failure: Any step exits non-zero or job times out; check red
+  exclusions:
+    - Production API keys, Stripe, Grizzly SMS, or live webhooks
+    - Deploy, container registry push, release automation (v1)

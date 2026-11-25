@@ -82,14 +82,11 @@ src/app/
 ├── api/
 │   ├── dependencies.py              # get_db, get_current_identity (bearer)
 │   └── routes/
-│       ├── contacts.py              # existing
 │       ├── session.py               # POST /session
 │       └── me.py                      # /me/* routes
 ├── schemas/
-│   ├── contact.py
 │   └── identity.py                    # Identity, session, checkout, history DTOs
 ├── services/
-│   ├── contact_service.py
 │   ├── identity_service.py
 │   └── session_service.py
 ├── repositories/
@@ -97,7 +94,6 @@ src/app/
 │   ├── identity_repository.py
 │   └── session_credential_repository.py
 ├── models/
-│   ├── contact.py
 │   └── identity.py                    # ORM models (+ checkout/history)
 └── db/
     ├── base.py
@@ -105,17 +101,15 @@ src/app/
 
 tests/
 ├── unit/
-│   ├── test_contact_service.py
 │   ├── test_identity_service.py
 │   └── test_session_service.py
 └── integration/
-    ├── test_contacts_api.py
     └── test_identity_api.py
 
 alembic/versions/                      # New migration for identity tables
 ```
 
-**Structure Decision**: Extend existing `src/app/` package; identity routes parallel to contacts.
+**Structure Decision**: Identity routes live in the existing `src/app/` package.
 
 ## Complexity Tracking
 

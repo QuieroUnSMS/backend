@@ -1,12 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.api.routes import contacts, me, session
+from app.api.routes import me, session
 from app.core.exceptions import (
     AlreadyRegisteredError,
-    ContactNotFoundError,
     DuplicateIdentifierError,
-    DuplicatePhoneError,
     IdentitySuspendedError,
     InvalidSessionError,
     RegistrationRequiredError,
@@ -14,29 +12,8 @@ from app.core.exceptions import (
 from app.models import identity as _identity_models  # noqa: F401
 
 app = FastAPI(title="QuieroUnSMS Backend", version="0.2.0")
-app.include_router(contacts.router)
 app.include_router(session.router)
 app.include_router(me.router)
-
-
-@app.exception_handler(ContactNotFoundError)
-async def contact_not_found_handler(
-    _request: Request, exc: ContactNotFoundError
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=404,
-        content={"detail": f"Contact not found: {exc.args[0]}"},
-    )
-
-
-@app.exception_handler(DuplicatePhoneError)
-async def duplicate_phone_handler(
-    _request: Request, exc: DuplicatePhoneError
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=409,
-        content={"detail": f"Phone number already in use: {exc.args[0]}"},
-    )
 
 
 @app.exception_handler(InvalidSessionError)

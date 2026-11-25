@@ -10,7 +10,7 @@ description: "Task list for Guest-First Identity and Optional Registration"
 
 **Tests**: Included — constitution TDD (non-negotiable) and plan testing strategy. Write tests first; confirm failure before implementation.
 
-**Organization**: Phases follow user stories P1 → P2 → P3. Existing contacts stack stays; this feature adds identity.
+**Organization**: Phases follow user stories P1 → P2 → P3. This feature adds identity.
 
 ## Format: `[ID] [P?] [Story] Description`
 

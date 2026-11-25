@@ -33,7 +33,11 @@ def _engine_available(url: str) -> bool:
 @pytest.fixture(scope="session")
 def database_url() -> str:
     if not _engine_available(TEST_DATABASE_URL):
-        pytest.skip(f"PostgreSQL not available at {TEST_DATABASE_URL}")
+        message = f"PostgreSQL not available at {TEST_DATABASE_URL}"
+        # GitHub Actions sets CI=true. A skip would exit 0 and hide a missing database (FR-007).
+        if os.environ.get("CI"):
+            pytest.fail(message)
+        pytest.skip(message)
     return TEST_DATABASE_URL
 
 

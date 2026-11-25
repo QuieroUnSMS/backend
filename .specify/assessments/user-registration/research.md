@@ -18,7 +18,7 @@
 
 - Constitution **III. MVP-First Product Scope** explicitly requires honoring optional registration and low-friction anonymous sessions while delivering purchase and SMS visibility first — [source: `.specify/memory/constitution.md`] (confidence: high, cited)
 - Constitution **IV. Privacy and Minimal PII** requires collecting only necessary account/payment/number data and defaulting away from PII beyond purchase needs — [source: `.specify/memory/constitution.md`] (confidence: high, cited)
-- Backend today exposes only a Contacts CRUD example; `specs/001-starting-point` states auth is out of scope; tasks note **no auth** — [source: `src/app/main.py`, `specs/001-starting-point/spec.md`, `specs/001-starting-point/tasks.md`] (confidence: high, cited)
+- Auth and registration were greenfield when this assessment was written; the backend had no session or account API yet — [source: `.specify/assessments/user-registration/intake.md`] (confidence: high, cited)
 - Intake records product decisions: email **or** phone required to register (other can be added later); **no verification** at signup for now; guest session state and purchase history on **backend**; guest can link email/phone to become a full account; **greenfield** APIs — [source: `.specify/assessments/user-registration/intake.md`] (confidence: high, cited)
 - **Tension:** `docs/welcome.md` still describes frontend `sessionStorage` and cookies for session persistence, while intake resolves storage to the backend — [source: `docs/welcome.md` §4 vs. intake.md] (confidence: high, cited)
 
@@ -39,7 +39,7 @@
 - **Legal/privacy (product text):** Collect account details, payment information, and temporary numbers; SMS stored temporarily then deleted; users must not submit sensitive data through temp numbers; suspension for abuse — [source: `docs/welcome.md` §7] (confidence: high, cited)
 - **Payments:** SPEI and Stripe planned — payment rails may impose their own identity, fraud, and retention requirements independent of “no verification at signup” — [source: `docs/welcome.md` §5] (confidence: medium, cited; provider rules ASSUMPTION)
 - **Session security:** Server-issued guest identifiers should have high entropy, not accept client-chosen IDs, and rotate/ invalidate on privilege change (e.g., guest → registered) to mitigate fixation/hijacking — [source: OWASP session guidance — secondary; ASSUMPTION for implementation mapping] (confidence: medium, assumption)
-- **E.164 phone validation** already established for contacts API may extend to user phone fields — [source: `specs/001-starting-point/spec.md` clarifications] (confidence: medium, cited)
+- **E.164 phone validation** (leading `+`, no auto-normalization) applies to account phone fields — [source: `specs/001-user-registration/spec.md`] (confidence: high, cited)
 - **Engineering constraint:** Constitution mandates TDD and layered service–repository design for new auth/session domains — [source: `.specify/memory/constitution.md`] (confidence: high, cited)
 - **Retention periods** for guest purchase history and in-progress checkout are not defined in product docs — [source: `docs/welcome.md`, intake] (confidence: high, cited gap)
 
@@ -65,7 +65,6 @@
 - `docs/welcome.md` (repo path, policy: n/a)
 - `.specify/memory/constitution.md` (repo path, policy: n/a)
 - `.specify/assessments/user-registration/intake.md` (repo path, policy: n/a)
-- `specs/001-starting-point/spec.md`, `tasks.md` (repo path, policy: n/a)
 - `src/app/main.py` (repo path, policy: n/a)
 - https://stackoverflow.com/questions/49624742/android-firebase-authentication-how-to-link-existing-user-account-to-anonymous (host: stackoverflow.com, policy: allowlisted)
 - https://stackoverflow.com/questions/78253016/firebase-link-existing-user-to-anonymous-account (host: stackoverflow.com, policy: allowlisted)
