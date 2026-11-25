@@ -1,8 +1,8 @@
 # Implementation Plan: Guest-First Identity and Optional Registration
 
-**Branch**: `002-user-registration` | **Date**: 2026-11-24 | **Spec**: [spec.md](./spec.md)
+**Branch**: `001-user-registration` | **Date**: 2026-11-24 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `/specs/002-user-registration/spec.md`
+**Input**: Feature specification from `/specs/001-user-registration/spec.md`
 
 ## Summary
 
@@ -57,7 +57,7 @@ with [contracts/openapi.yaml](./contracts/openapi.yaml) at implementation time.
 ### Documentation (this feature)
 
 ```text
-specs/002-user-registration/
+specs/001-user-registration/
 ├── plan.md              # This file
 ├── research.md          # Phase 0
 ├── data-model.md        # Phase 1

@@ -4,7 +4,7 @@ description: "Task list for Guest-First Identity and Optional Registration"
 
 # Tasks: Guest-First Identity and Optional Registration
 
-**Input**: Design documents from `/specs/002-user-registration/`
+**Input**: Design documents from `/specs/001-user-registration/`
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/openapi.yaml, quickstart.md
 
@@ -63,7 +63,7 @@ description: "Task list for Guest-First Identity and Optional Registration"
 - [x] T014 [US1] Implement `POST /session` (201 new guest; 200 if valid bearer; 401 if bearer present but invalid) in `src/app/api/routes/session.py`
 - [x] T015 [US1] Implement `GET /me`, `GET`/`PUT /me/checkout-state`, `GET`/`POST /me/purchase-history` in `src/app/api/routes/me.py`
 - [x] T016 [US1] Mount session and me routers and map new domain errors in `src/app/main.py`
-- [x] T017 [US1] Merge US1 paths from `specs/002-user-registration/contracts/openapi.yaml` into repository-root `openapi.yaml`
+- [x] T017 [US1] Merge US1 paths from `specs/001-user-registration/contracts/openapi.yaml` into repository-root `openapi.yaml`
 
 **Checkpoint**: User Story 1 independently testable (guest continuity)
 
@@ -117,8 +117,8 @@ description: "Task list for Guest-First Identity and Optional Registration"
 
 **Purpose**: Contract parity and quickstart proof
 
-- [x] T030 Confirm repository-root `openapi.yaml` matches `specs/002-user-registration/contracts/openapi.yaml` for identity paths (Constitution VI)
-- [x] T031 Run the manual acceptance table in `specs/002-user-registration/quickstart.md` against a local server and fix any spec mismatches
+- [x] T030 Confirm repository-root `openapi.yaml` matches `specs/001-user-registration/contracts/openapi.yaml` for identity paths (Constitution VI)
+- [x] T031 Run the manual acceptance table in `specs/001-user-registration/quickstart.md` against a local server and fix any spec mismatches
 - [x] T032 [P] Use clear Spanish `detail` strings for identity 401/403/409 responses where user-facing, per constitution language constraint, in `src/app/main.py`
 
 ---

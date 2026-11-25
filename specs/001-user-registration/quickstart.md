@@ -1,6 +1,6 @@
 # Quickstart: Validate Guest-First Identity
 
-**Feature**: `002-user-registration` | **Date**: 2026-11-24
+**Feature**: `001-user-registration` | **Date**: 2026-11-24
 
 End-to-end validation against [spec.md](./spec.md), [data-model.md](./data-model.md), and
 [contracts/openapi.yaml](./contracts/openapi.yaml) (merged into root `openapi.yaml` when implemented).

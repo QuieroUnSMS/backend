@@ -1,4 +1,4 @@
-# Feature contract (002-user-registration)
+# Feature contract (001-user-registration)
 # Merge these paths and components into repository-root openapi.yaml at implementation time.
 
 openapi: 3.1.0

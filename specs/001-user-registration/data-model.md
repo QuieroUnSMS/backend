@@ -1,6 +1,6 @@
 # Data Model: Identity and Session
 
-**Feature**: `002-user-registration` | **Date**: 2026-11-24
+**Feature**: `001-user-registration` | **Date**: 2026-11-24
 
 ## Entity: Identity
 

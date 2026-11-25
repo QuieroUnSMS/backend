@@ -1,6 +1,6 @@
 # Research: Guest-First Identity and Optional Registration
 
-**Feature**: `002-user-registration` | **Date**: 2026-11-24
+**Feature**: `001-user-registration` | **Date**: 2026-11-24
 
 ## 1. Session credential transport and format
 
@@ -76,7 +76,7 @@
 ## 9. OpenAPI and contract location
 
 - **Decision**: Feature contract drafted in
-  `specs/002-user-registration/contracts/openapi.yaml`; implementation phase merges paths/schemas
+  `specs/001-user-registration/contracts/openapi.yaml`; implementation phase merges paths/schemas
   into repository-root `openapi.yaml` in the same change set (Constitution VI).
 - **Rationale**: Spec Kit parity during plan; single canonical file at root for clients.
 

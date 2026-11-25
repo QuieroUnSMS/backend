@@ -1,6 +1,6 @@
 # Feature Specification: Guest-First Identity and Optional Registration
 
-**Feature Branch**: `002-user-registration`
+**Feature Branch**: `001-user-registration`
 
 **Created**: 2026-11-24
 
